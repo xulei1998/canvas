@@ -1,12 +1,77 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>画板</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>画板</title>
+    <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-  
+    <canvas id="canvas" width="100" height="100"></canvas>  <!--初始canvas宽高-->
+    <script>
+        let canvas = document.getElementById("canvas");  //获取canvas
+        canvas.width = document.documentElement.clientWidth  //把canvas宽高变成文档的宽高
+        canvas.height = document.documentElement.clientHeight
+
+        //画线
+        let ctx = canvas.getContext("2d");
+        ctx.fillStyle = "black";  //填充颜色是黑色
+        ctx.strokeStyle = 'none'  //边框不加颜色
+        ctx.lineWidth=10;
+        ctx.lineCap="round";
+        function drawLine(x1,y1,x2,y2){   //函数  画点成线
+          ctx.beginPath();
+          ctx.moveTo(x1,y1);
+          ctx.lineTo(x2,y2);
+          ctx.stroke();
+        }
+        
+        let painting = false //默认没有在画
+        let last //记录上一次的值
+
+
+        var isTouchDevice='ontouchstart' in document.documentElement;
+        if (isTouchDevice) {
+          canvas.ontouchstart=(e) =>{
+            let x = e.touches[0].clientX
+            let y = e.touches[0].clientY
+            last=[x,y]
+          }
+          canvas.ontouchmove=(e) => {
+            let x = e.touches[0].clientX
+            let y = e.touches[0].clientY
+            drawLine(last[0],last[1],x,y)
+            last=[x,y] 
+
+          }
+        }else {
+          canvas.onmousedown = (e) => {
+          painting = true   //用户点击鼠标 就是在画
+          last=[e.clientX,e.clientY] //当鼠标按下的时候，这一次作为上一次
+        }
+          canvas.onmousemove = (e) => {  //鼠标在移动的时候
+            if (painting === true) {   //如果在鼠标按下
+               drawLine(last[0],last[1],e.clientX,e.clientY)  //把这一次和上一次的划线连起来
+               last=[e.clientX,e.clientY] //及时修改上一次
+            } else {
+                console.log('什么都不做')   //如果鼠标没有按下
+            }
+        }
+
+        canvas.onmouseup = () => {   //鼠标放下的时候
+            painting = false         //鼠标不在画
+        }
+        }
+ 
+        
+
+
+
+
+    </script>
 </body>
+
 </html>
